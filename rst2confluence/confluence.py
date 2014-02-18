@@ -314,6 +314,40 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         self._add("{tip}")
         self.do_depart_admonition()
 
+    def visit_docinfo(self, node):
+        self.table = True
+
+    def depart_docinfo(self, node):
+        self.table = False
+        self._newline(2)
+
+    def visit_author(self, node):
+        self._add("||author|") 
+        self.visit_field_body(node)
+
+    def visit_inline(self, node):
+        pass
+
+    def depart_inline(self, node):
+        pass
+
+    def depart_author(self, node):
+        self.depart_field_body(node)
+
+    def visit_date(self, node):
+        self._add("||date|") 
+        self.visit_field_body(node)
+
+    def depart_date(self, node):
+        self.depart_field_body(node)
+
+    def visit_revision(self, node):
+        self._add("||rev|") 
+        self.visit_field_body(node)
+
+    def depart_revision(self, node):
+        self.depart_field_body(node)
+
     def visit_warning(self, node):
         self._add("{warning}")
         self.do_visit_admonition()

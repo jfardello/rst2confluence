@@ -8,11 +8,22 @@ from docutils import nodes, writers
 
 # sys.stdout = codecs.getwriter('shift_jis')(sys.stdout)
 
+
 class Writer(writers.Writer):
+
+    #Prevent the filtering of the Meta directive. 
+    supported = ['html']
+
     def translate(self):
         self.visitor = ConfluenceTranslator(self.document)
         self.document.walkabout(self.visitor)
-        self.output = self.visitor.astext()
+        #Save some metadata as a comment, one per line.
+        self.output = unicode()
+        for key in self.visitor.meta.keys():
+            self.output += "###. %s:%s\n" % (key, self.visitor.meta[key])
+
+        self.output += "\n"
+        self.output += self.visitor.astext()
 
 
 class ConfluenceTranslator(nodes.NodeVisitor):
@@ -24,21 +35,30 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     """
 
     empty_methods = [
-        'visit_document', 'depart_document',
+        'visit_raw',
+        'depart_raw',
+        'visit_document',
+        'depart_document',
+        'depart_meta',
         'depart_Text',
         'depart_list_item',
+        'visit_field', 'depart_field', 'depart_field_name',
         'depart_target',
         'visit_decoration', 'depart_decoration',
         'depart_footer',
         'visit_tgroup', 'depart_tgroup',
         'visit_colspec', 'depart_colspec',
         'depart_image',
-        'visit_field', 'depart_field', 'depart_field_name',
+        'visit_field',
+        'depart_field', 'depart_field_name',
         'depart_line_block', 'visit_line'
     ]
 
     inCode = False
     keepLineBreaks = False
+    lastTableEntryBar = 0
+    docinfo = False
+    meta = {'keywords': '', 'title': ''}
 
     def __init__(self, document):
         nodes.NodeVisitor.__init__(self, document)
@@ -101,10 +121,19 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         return "".join(self.content)
 
     def unknown_visit(self, node):
-        raise Exception("Unknown visit on line %s: %s." % (node.line, repr(node)))
+        #non-standard docinfo field, so becomes a generic field element.
+        #thats why they render different, they render as normal table fields.
+        if self.docinfo:
+            self._add("||%s|" % node.__class__.__name__)
+            self.visit_field_body(node)
+        else:
+            raise Exception("Unknown visit on line %s: %s." % (node.line, repr(node)))
 
     def unknown_departure(self, node):
-        raise Exception("Unknown departure on line %s: %s." % (node.line, repr(node)))
+        if self.docinfo:
+            self.depart_field_body(node)
+        else:
+            raise Exception("Unknown departure on line %s: %s." % (node.line, repr(node)))
 
 
     def visit_paragraph(self, node):
@@ -316,37 +345,23 @@ class ConfluenceTranslator(nodes.NodeVisitor):
 
     def visit_docinfo(self, node):
         self.table = True
+        self.docinfo = True
+
+    def visit_meta(self, node):
+        name = node.get('name')
+        content = node.get('content')
+        self.meta[name] = content
 
     def depart_docinfo(self, node):
         self.table = False
+        self.docinfo = False
         self._newline(2)
-
-    def visit_author(self, node):
-        self._add("||author|") 
-        self.visit_field_body(node)
 
     def visit_inline(self, node):
         pass
 
     def depart_inline(self, node):
         pass
-
-    def depart_author(self, node):
-        self.depart_field_body(node)
-
-    def visit_date(self, node):
-        self._add("||date|") 
-        self.visit_field_body(node)
-
-    def depart_date(self, node):
-        self.depart_field_body(node)
-
-    def visit_revision(self, node):
-        self._add("||rev|") 
-        self.visit_field_body(node)
-
-    def depart_revision(self, node):
-        self.depart_field_body(node)
 
     def visit_warning(self, node):
         self._add("{warning}")
@@ -356,7 +371,8 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         self._add("{warning}")
         self.do_depart_admonition()
 
-        #admonition helpers
+
+    #admonition helpers
     def do_visit_admonition(self):
         self.list_prefix.append([])
 

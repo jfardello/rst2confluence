@@ -1,5 +1,5 @@
-###. keywords:foo, bar
-###. title:foo document
+###. meta/keywords:foo, bar
+###. meta/title:foo document
 
 h1. Foo{anchor:foo}
 

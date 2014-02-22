@@ -20,7 +20,7 @@ class Writer(writers.Writer):
         #Save some metadata as a comment, one per line.
         self.output = unicode()
         for key in self.visitor.meta.keys():
-            self.output += "###. %s:%s\n" % (key, self.visitor.meta[key])
+            self.output += "###. meta/%s:%s\n" % (key, self.visitor.meta[key])
 
         self.output += "\n"
         self.output += self.visitor.astext()
@@ -58,7 +58,7 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     keepLineBreaks = False
     lastTableEntryBar = 0
     docinfo = False
-    meta = {'keywords': '', 'title': ''}
+    meta = {}
 
     def __init__(self, document):
         nodes.NodeVisitor.__init__(self, document)
@@ -96,6 +96,7 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         for method in self.empty_methods:
             setattr(self, method, lambda n: None)
 
+
     def _add(self, string):
         if not self.block:
             self.addedNewline = False
@@ -121,19 +122,10 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         return "".join(self.content)
 
     def unknown_visit(self, node):
-        #non-standard docinfo field, so becomes a generic field element.
-        #thats why they render different, they render as normal table fields.
-        if self.docinfo:
-            self._add("||%s|" % node.__class__.__name__)
-            self.visit_field_body(node)
-        else:
-            raise Exception("Unknown visit on line %s: %s." % (node.line, repr(node)))
+        raise Exception("Unknown visit on line %s: %s." % (node.line, repr(node)))
 
     def unknown_departure(self, node):
-        if self.docinfo:
-            self.depart_field_body(node)
-        else:
-            raise Exception("Unknown departure on line %s: %s." % (node.line, repr(node)))
+        raise Exception("Unknown departure on line %s: %s." % (node.line, repr(node)))
 
 
     def visit_paragraph(self, node):
@@ -352,10 +344,61 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         content = node.get('content')
         self.meta[name] = content
 
+
     def depart_docinfo(self, node):
         self.table = False
         self.docinfo = False
         self._newline(2)
+
+
+    def _docinfo_field(self, node):
+        #non-standard docinfo field, becomes a generic field element.
+        #and render as normal table fields.
+        if self.docinfo:
+            self._add("||%s|" % node.__class__.__name__)
+            self.visit_field_body(node)
+
+    def visit_author(self, node):
+        return self._docinfo_field(node)
+
+    def depart_author(self, node):
+        if self.docinfo:
+            self.depart_field_body(node)
+
+    def visit_contact(self, node):
+        return self._docinfo_field(node)
+
+    def depart_contact(self, node):
+        if self.docinfo:
+            self.depart_field_body(node)
+
+    def visit_date(self, node):
+        return self._docinfo_field(node)
+
+    def depart_date(self, node):
+        if self.docinfo:
+            self.depart_field_body(node)
+
+    def visit_status(self, node):
+        return self._docinfo_field(node)
+
+    def depart_status(self, node):
+        if self.docinfo:
+            self.depart_field_body(node)
+
+    def visit_version(self, node):
+        return self._docinfo_field(node)
+
+    def depart_version(self, node):
+        if self.docinfo:
+            self.depart_field_body(node)
+
+    def visit_revision(self, node):
+        return self._docinfo_field(node)
+
+    def depart_revision(self, node):
+        if self.docinfo:
+            self.depart_field_body(node)
 
     def visit_inline(self, node):
         pass

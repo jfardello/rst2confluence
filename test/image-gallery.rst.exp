@@ -1,4 +1,3 @@
-
 Class names beginning with "gallery-" form a gallery.
 {gallery:include=cat.jpg,dog.jpg}
 {gallery:include=cat.jpg}

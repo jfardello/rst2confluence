@@ -16,13 +16,15 @@ class Writer(writers.Writer):
 
     def translate(self):
         self.visitor = ConfluenceTranslator(self.document)
+        self.visitor.meta = {}
         self.document.walkabout(self.visitor)
         #Save some metadata as a comment, one per line.
         self.output = unicode()
         for key in self.visitor.meta.keys():
             self.output += "###. meta/%s:%s\n" % (key, self.visitor.meta[key])
 
-        self.output += "\n"
+        if len(self.visitor.meta.keys()) > 0:
+            self.output += "\n"
         self.output += self.visitor.astext()
 
 

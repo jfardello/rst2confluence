@@ -1,0 +1,12 @@
+MANIFEST.in
+README.rst
+setup.py
+src/rst2confluence/__init__.py
+src/rst2confluence/cli.py
+src/rst2confluence/confluence.py
+src/rst2confluence.egg-info/PKG-INFO
+src/rst2confluence.egg-info/SOURCES.txt
+src/rst2confluence.egg-info/dependency_links.txt
+src/rst2confluence.egg-info/entry_points.txt
+src/rst2confluence.egg-info/requires.txt
+src/rst2confluence.egg-info/top_level.txt

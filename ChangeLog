@@ -1,3 +1,11 @@
+2014-02-23  José Fardello  <jmfardello@gmail.com>
+
+    * Add support for the meta directive
+    * Add docinfo support
+    * Python 3 conversion
+    * Move to unittest2
+    * Move to setuptools
+
 2014-01-20  Christian Weiske  <christian.weiske@netresearch.de>
 
 	* Fix bug #7: Crash on document with a single bold word

@@ -1,0 +1,3 @@
+[console_scripts]
+rst2confluence = rst2confluence.cli:main
+

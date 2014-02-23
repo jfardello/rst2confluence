@@ -2,17 +2,20 @@
 # Runs rst2confluence.py on all .rst files in test/ and compares them
 # to the expected output (.exp)
 if [ $# -eq 0 ]; then
-    files=test/*.rst
+    files=tests/rst/*.rst
 else
     files="$*"
 fi
 
+mkdir -p tests/tmp
+
 for i in $files; do
     echo -n Testing $i
-    expFile="$i.exp"
-    outFile="$i.out"
-    diffFile="$i.diff"
-    ./rst2confluence.py "$i" > "$outFile"
+    i=`basename $i`
+    expFile="tests/exp/$i.exp"
+    outFile="tests/tmp/$i.out"
+    diffFile="tests/tmp/$i.diff"
+    rst2confluence "tests/rst/$i"  "$outFile"
     if [ $? -ne 0 ]; then
         echo -e "\033[00;31merror running rst2confluence\033[00m"
         break;

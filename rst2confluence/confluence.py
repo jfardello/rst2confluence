@@ -37,23 +37,27 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     """
 
     empty_methods = [
-        'visit_raw',
-        'depart_raw',
-        'visit_document',
-        'depart_document',
-        'depart_meta',
         'depart_Text',
-        'depart_list_item',
-        'visit_field', 'depart_field', 'depart_field_name',
-        'depart_target',
-        'visit_decoration', 'depart_decoration',
+        'depart_colspec',
+        'depart_decoration',
+        'depart_document',
+        'depart_field',
+        'depart_field_name',
         'depart_footer',
-        'visit_tgroup', 'depart_tgroup',
-        'visit_colspec', 'depart_colspec',
         'depart_image',
+        'depart_line_block',
+        'depart_list_item',
+        'depart_meta',
+        'depart_raw',
+        'depart_target',
+        'depart_tgroup',
+        'visit_colspec',
+        'visit_decoration',
+        'visit_document',
         'visit_field',
-        'depart_field', 'depart_field_name',
-        'depart_line_block', 'visit_line'
+        'visit_line',
+        'visit_raw',
+        'visit_tgroup'
     ]
 
     inCode = False
@@ -98,7 +102,6 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         for method in self.empty_methods:
             setattr(self, method, lambda n: None)
 
-
     def _add(self, string):
         if not self.block:
             self.addedNewline = False
@@ -128,7 +131,6 @@ class ConfluenceTranslator(nodes.NodeVisitor):
 
     def unknown_departure(self, node):
         raise Exception("Unknown departure on line %s: %s." % (node.line, repr(node)))
-
 
     def visit_paragraph(self, node):
         if not self.first and not self.footnote and not self.field_body and self.list_level == 0:
@@ -346,12 +348,10 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         content = node.get('content')
         self.meta[name] = content
 
-
     def depart_docinfo(self, node):
         self.table = False
         self.docinfo = False
         self._newline(2)
-
 
     def _docinfo_field(self, node):
         #non-standard docinfo field, becomes a generic field element.
@@ -415,7 +415,6 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     def depart_warning(self, node):
         self._add("{warning}")
         self.do_depart_admonition()
-
 
     #admonition helpers
     def do_visit_admonition(self):
@@ -623,7 +622,6 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     def depart_system_message(self, node):
         self._add("{warning}")
 
-
     #field lists
     def visit_field_list(self, node):
         self._newline()
@@ -650,7 +648,6 @@ class ConfluenceTranslator(nodes.NodeVisitor):
 
     def depart_line(self, node):
         self._newline()
-
 
     #roles http://docutils.sourceforge.net/docs/ref/rst/roles.html
     def visit_title_reference(self, node):

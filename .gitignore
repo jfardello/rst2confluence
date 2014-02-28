@@ -1,6 +1,11 @@
-*.pyc
+*.py[cod]
+*.egg-info
+__pycache__/
 MANIFEST
 dist
 README.html
 build
 scripts/
+.tox
+.coverage
+htmlcov

@@ -2,30 +2,44 @@
 # -*- coding: utf-8 -*-
 import sys
 import codecs
-import urllib
 
 from docutils import nodes, writers
 
-# sys.stdout = codecs.getwriter('shift_jis')(sys.stdout)
+#Borrowed from six.
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+
+
+if PY3:
+    from urllib.parse import unquote
+    def u(s):
+        return s
+if PY2:
+    from urllib import unquote
+    def u(s, encoding='utf-8'):
+        return unicode(s, encoding=encoding)
 
 
 class Writer(writers.Writer):
 
     #Prevent the filtering of the Meta directive. 
     supported = ['html']
+    def __init__(self):
+        self.output = u('')
+        self.parts = {}
 
     def translate(self):
-        self.visitor = ConfluenceTranslator(self.document)
-        self.visitor.meta = {}
-        self.document.walkabout(self.visitor)
+        visitor = ConfluenceTranslator(self.document)
+        visitor.meta = {}
+        self.document.walkabout(visitor)
         #Save some metadata as a comment, one per line.
-        self.output = unicode()
-        for key in self.visitor.meta.keys():
-            self.output += "###. meta/%s:%s\n" % (key, self.visitor.meta[key])
+        for key in sorted(visitor.meta.keys()):
+            self.output += "###. meta/%s:%s\n" % (key, visitor.meta[key])
 
-        if len(self.visitor.meta.keys()) > 0:
+        if len(visitor.meta) > 0:
             self.output += "\n"
-        self.output += self.visitor.astext()
+
+        self.output += visitor.astext()
 
 
 class ConfluenceTranslator(nodes.NodeVisitor):
@@ -173,7 +187,8 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         self.section_level -= 1
 
     def cflAnchorValue(self, name):
-        return name.replace("-", "").replace(" ", '').replace(u"ä", "a").replace(u"ö", "o").replace(u"ü", "u").replace(u"ß", "s")
+        return name.replace("-", "").replace(" ", '').replace(u("ä"),
+                "a").replace(u("ö"), "o").replace(u("ü"), "u").replace(u("ß"), "s")
 
     def visit_target(self, node):
         if not node.has_key("refid"):
@@ -194,7 +209,7 @@ class ConfluenceTranslator(nodes.NodeVisitor):
             else:
                 self._add("[")
                 self._add(node.children[0].astext() + "|")
-                self._add(urllib.unquote(node["refuri"]) + "]")
+                self._add(unquote(node["refuri"]) + "]")
         else:
             assert 'refid' in node, \
                    'References must have "refuri" or "refid" attribute.'
@@ -456,7 +471,9 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         if 'align' in node:
             atts['align'] = node['align']
         attributes = []
-        for att in atts.iterkeys():
+        #py3k compat, keys in py3 may have a different order,
+        #so out unittest may fail.
+        for att in sorted(iter(atts.keys())):
             if atts[att] == True:
                 attributes.append(att)
             else:

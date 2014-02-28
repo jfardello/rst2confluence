@@ -1,21 +1,34 @@
 #!/usr/bin/env python
-import os, shutil
-from distutils.core import setup
+import imp
+from setuptools import setup, find_packages
 
-if not os.path.exists('scripts'):
-    os.makedirs('scripts')
+f, filename, description = imp.find_module('src/rst2confluence')
+rst2confluence = imp.load_module('rst2confluence', f, filename, description)
 
-shutil.copyfile('rst2confluence.py', 'scripts/rst2confluence')
 
 setup(name='rst2confluence',
-      version='0.4.2',
+      version = rst2confluence.__version__,
       description='reStructuredText-to-Confluence markup converter',
       author='Kenichiro TANAKA',
       author_email='tanaka.kenichiro@gmail.com',
       maintainer='Christian Weiske',
       maintainer_email='christian.weiske@netresearch.de',
       url='https://github.com/cweiske/rst2confluence',
+      packages=find_packages('src'),
       py_modules=['rst2confluence.confluence'],
-      #package_dir={'rst2confluence': 'src/rst2confluence'},
-      scripts=['scripts/rst2confluence']
+      install_requires=['docutils'],
+      test_suite = "tests.suite",
+      package_dir = {'': 'src'},
+      classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
+      ],
+      entry_points={
+        'console_scripts': [
+            'rst2confluence = rst2confluence.cli:main',
+            ],
+      },
+      
      )

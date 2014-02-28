@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: rst2confluence
+Version: 0.5.0
+Summary: reStructuredText-to-Confluence markup converter
+Home-page: https://github.com/cweiske/rst2confluence
+Author: Christian Weiske
+Author-email: christian.weiske@netresearch.de
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)

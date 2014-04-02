@@ -27,6 +27,8 @@ Supported directives
   - warning
 - field lists
 - line blocks (except nested ones)
+- docinfo
+- meta
 
 
 Additional features
@@ -57,7 +59,10 @@ Usage
 =====
 ::
 
-    ./rst2confluence.py /path/to/file.rst
+    rst2confluence /path/to/file.rst
+
+Alternativelly, you may use rst2confluence.confluence.Writer as any docutils
+writer.
 
 
 ============
@@ -65,7 +70,8 @@ Installation
 ============
 ::
 
-    sudo ./setup.py install
+    sudo python setup.py install
+
 
 
 =====
@@ -75,12 +81,13 @@ We have some examples how ``rst2confluence`` should behave.
 
 Check if it does what it should::
 
-    ./run-tests.sh
+    python setup.py test
 
-Run a single test::
+Or run a single test::
 
-    ./run-test.sh test/figure.rst
+    ./run-tests.sh tests/rst/bullet_list.rst
 
+   
 
 ===========
 Other tools

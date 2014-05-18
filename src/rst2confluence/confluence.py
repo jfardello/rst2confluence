@@ -52,6 +52,7 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     empty_methods = [
         'depart_Text',
         'depart_colspec',
+        'depart_compound',
         'depart_decoration',
         'depart_document',
         'depart_field',
@@ -65,12 +66,13 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         'depart_target',
         'depart_tgroup',
         'visit_colspec',
+        'visit_compound',
         'visit_decoration',
         'visit_document',
         'visit_field',
         'visit_line',
         'visit_raw',
-        'visit_tgroup'
+        'visit_tgroup',
     ]
 
     inCode = False
@@ -147,12 +149,18 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         raise Exception("Unknown departure on line %s: %s." %
                         (node.line, repr(node)))
 
+    def visit_compact_paragraph(self, node):
+        self.visit_paragraph(node)
+
     def visit_paragraph(self, node):
         if not self.first and not self.footnote and not self.field_body \
                 and self.list_level == 0:
             self._newline()
         if self.list_level > 0 and not self.lineBeginsWithListIndicator:
             self._add(" " * (self.list_level + (self.list_level > 0)))
+
+    def depart_compact_paragraph(self, node):
+        self.depart_paragraph(node)
 
     def depart_paragraph(self, node):
         if not self.footnote and not isinstance(node.parent, nodes.field_body):
@@ -527,7 +535,6 @@ class ConfluenceTranslator(nodes.NodeVisitor):
     # table
     def visit_table(self, node):
         self.table = True
-#        raise nodes.SkipNode
 
     def depart_table(self, node):
         self.table = False

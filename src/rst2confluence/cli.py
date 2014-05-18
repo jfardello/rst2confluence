@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 """
-A minimal front end to the Docutils Publisher, producing Confluence Wiki output.
+A minimal front end to the Docutils Publisher, producing Confluence Wiki
+output.
 """
 try:
     import locale
@@ -14,8 +15,9 @@ from . import confluence
 
 def main():
     
-    description = ('Generates documents in Confluence Wiki format from standalone '
-                   'reStructuredText sources.  ' + default_description)
+    description = ('Generates documents in Confluence Wiki format from'
+                   ' standalone reStructuredText sources. ' + 
+                   default_description)
     publish_cmdline(writer=confluence.Writer(), description=description)
 
 

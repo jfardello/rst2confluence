@@ -62,6 +62,7 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         'depart_line_block',
         'depart_list_item',
         'depart_meta',
+        'depart_problematic',
         'depart_raw',
         'depart_target',
         'depart_tgroup',
@@ -71,6 +72,7 @@ class ConfluenceTranslator(nodes.NodeVisitor):
         'visit_document',
         'visit_field',
         'visit_line',
+        'visit_problematic',
         'visit_raw',
         'visit_tgroup',
     ]
